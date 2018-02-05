@@ -1,7 +1,8 @@
-import { Middleware, MiddlewareAPI, Action } from 'redux';
+import { Middleware, MiddlewareAPI, Action, Dispatch, Store } from 'redux';
 import { Observable, ObservableInput } from 'rxjs/Observable';
 import { Scheduler } from 'rxjs/Scheduler';
 import { Operator } from 'rxjs/Operator';
+import { Subject } from 'rxjs/Subject';
 
 export declare class ActionsObservable<T extends Action> extends Observable<T> {
   /**
@@ -29,7 +30,14 @@ export declare class ActionsObservable<T extends Action> extends Observable<T> {
 }
 
 export declare interface Epic<T extends Action, S, D = any, O extends T = T> {
-  (action$: ActionsObservable<T>, store: MiddlewareAPI<S>, dependencies: D): Observable<O>;
+  (action$: ActionsObservable<T>, state$: StateSubject<S>, dependencies: D): Observable<O>;
+}
+
+export declare class StateSubject<T> extends Subject<T> {
+  constructor(store: Store<T>);
+  value?: T;
+  getState(): T;
+  dispatch: Dispatch<T>;
 }
 
 export interface EpicMiddleware<T extends Action, S, D = any, O extends T = T> extends Middleware {
